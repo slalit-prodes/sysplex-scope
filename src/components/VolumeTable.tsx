@@ -21,13 +21,26 @@ interface VolumeTableProps {
   variant: 'included' | 'excluded';
   onMoveVolumes: (volumeIds: string[]) => void;
   title: string;
+  externalSelectedIds?: Set<string>;
+  onExternalSelectionChange?: (ids: Set<string>) => void;
 }
 
 type SortField = 'volumeId' | 'size' | 'storageGroup';
 type SortDirection = 'asc' | 'desc';
 
-export function VolumeTable({ volumes, variant, onMoveVolumes, title }: VolumeTableProps) {
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+export function VolumeTable({ 
+  volumes, 
+  variant, 
+  onMoveVolumes, 
+  title,
+  externalSelectedIds,
+  onExternalSelectionChange,
+}: VolumeTableProps) {
+  const [internalSelectedIds, setInternalSelectedIds] = useState<Set<string>>(new Set());
+  
+  // Use external selection if provided, otherwise use internal
+  const selectedIds = externalSelectedIds ?? internalSelectedIds;
+  const setSelectedIds = onExternalSelectionChange ?? setInternalSelectedIds;
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState<SortField>('volumeId');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');

@@ -9,52 +9,33 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { MatchType } from '@/types/volume';
-import { Search, Eye, Plus, Minus, Filter, X } from 'lucide-react';
+import { Search, Filter, X, CheckSquare } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface PatternSelectorProps {
-  onPreview: (matchType: MatchType, pattern: string) => number;
-  onInclude: (matchType: MatchType, pattern: string) => void;
-  onExclude: (matchType: MatchType, pattern: string) => void;
+  onSelect: (matchType: MatchType, pattern: string) => void;
   onFilter: (matchType: MatchType, pattern: string) => void;
   onClearFilter: () => void;
   activeFilter: { matchType: MatchType; pattern: string } | null;
 }
 
 export function PatternSelector({
-  onPreview,
-  onInclude,
-  onExclude,
+  onSelect,
   onFilter,
   onClearFilter,
   activeFilter,
 }: PatternSelectorProps) {
   const [matchType, setMatchType] = useState<MatchType>('starts-with');
   const [pattern, setPattern] = useState('');
-  const [previewCount, setPreviewCount] = useState<number | null>(null);
 
-  const handlePreview = () => {
+  const handleSelect = () => {
     if (!pattern.trim()) return;
-    const count = onPreview(matchType, pattern.trim());
-    setPreviewCount(count);
-  };
-
-  const handleInclude = () => {
-    if (!pattern.trim()) return;
-    onInclude(matchType, pattern.trim());
-    setPreviewCount(null);
-  };
-
-  const handleExclude = () => {
-    if (!pattern.trim()) return;
-    onExclude(matchType, pattern.trim());
-    setPreviewCount(null);
+    onSelect(matchType, pattern.trim());
   };
 
   const handleFilter = () => {
     if (!pattern.trim()) return;
     onFilter(matchType, pattern.trim());
-    setPreviewCount(null);
   };
 
   const matchTypeLabels: Record<MatchType, string> = {
@@ -96,68 +77,33 @@ export function PatternSelector({
           </SelectContent>
         </Select>
 
-        <div className="relative flex-1 min-w-[200px] max-w-[300px]">
-          <Input
-            placeholder="Enter volume pattern (e.g. PROD, TEST, DB2)"
-            value={pattern}
-            onChange={(e) => {
-              setPattern(e.target.value.toUpperCase());
-              setPreviewCount(null);
-            }}
-            className="bg-background font-mono"
-          />
-          {previewCount !== null && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <Badge variant="outline" className="text-xs">
-                {previewCount} matches
-              </Badge>
-            </div>
-          )}
-        </div>
+        <Input
+          placeholder="Enter volume pattern (e.g. PROD, TEST, DB2)"
+          value={pattern}
+          onChange={(e) => setPattern(e.target.value.toUpperCase())}
+          className="bg-background font-mono flex-1 min-w-[200px] max-w-[300px]"
+        />
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePreview}
-            disabled={!pattern.trim()}
-          >
-            <Eye className="w-4 h-4 mr-1.5" />
-            Preview
-          </Button>
+        <Button
+          variant="default"
+          size="sm"
+          onClick={handleSelect}
+          disabled={!pattern.trim()}
+          className="bg-accent hover:bg-accent/90"
+        >
+          <CheckSquare className="w-4 h-4 mr-1.5" />
+          Select
+        </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExclude}
-            disabled={!pattern.trim()}
-            className="text-excluded hover:text-excluded hover:bg-excluded-light border-excluded/30"
-          >
-            <Minus className="w-4 h-4 mr-1.5" />
-            Exclude Matching
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleInclude}
-            disabled={!pattern.trim()}
-            className="text-included hover:text-included hover:bg-included-light border-included/30"
-          >
-            <Plus className="w-4 h-4 mr-1.5" />
-            Include Matching
-          </Button>
-
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleFilter}
-            disabled={!pattern.trim()}
-          >
-            <Filter className="w-4 h-4 mr-1.5" />
-            Apply as Filter
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleFilter}
+          disabled={!pattern.trim()}
+        >
+          <Filter className="w-4 h-4 mr-1.5" />
+          Filter
+        </Button>
       </div>
     </div>
   );
