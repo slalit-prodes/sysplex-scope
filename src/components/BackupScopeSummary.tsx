@@ -1,14 +1,61 @@
 import { BackupScopeSummary as SummaryType } from '@/types/volume';
-import { Progress } from '@/components/ui/progress';
 import { HardDrive, CheckCircle2, XCircle, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BackupScopeSummaryProps {
   summary: SummaryType;
+  compact?: boolean;
 }
 
-export function BackupScopeSummary({ summary }: BackupScopeSummaryProps) {
+export function BackupScopeSummary({ summary, compact = false }: BackupScopeSummaryProps) {
   const inclusionPercentage = (summary.includedCount / summary.totalVolumes) * 100;
+
+  if (compact) {
+    return (
+      <div className="bg-card rounded-lg border border-border shadow-sm px-4 py-3">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <Database className="w-4 h-4 text-accent" />
+            <span className="text-sm font-semibold text-foreground">Backup Scope</span>
+          </div>
+          
+          <div className="flex items-center gap-1">
+            <HardDrive className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Total:</span>
+            <span className="text-sm font-semibold">{summary.totalVolumes.toLocaleString()}</span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5 text-included" />
+            <span className="text-sm text-muted-foreground">Included:</span>
+            <span className="text-sm font-semibold text-included">{summary.includedCount.toLocaleString()}</span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <XCircle className="w-3.5 h-3.5 text-excluded" />
+            <span className="text-sm text-muted-foreground">Excluded:</span>
+            <span className="text-sm font-semibold text-excluded">{summary.excludedCount.toLocaleString()}</span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <Database className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Size:</span>
+            <span className="text-sm font-semibold">{summary.estimatedSize.toFixed(1)} TB</span>
+          </div>
+
+          <div className="flex items-center gap-2 ml-auto">
+            <span className="text-xs text-muted-foreground">{inclusionPercentage.toFixed(0)}%</span>
+            <div className="w-24 h-2 overflow-hidden rounded-full bg-excluded-light">
+              <div
+                className="h-full bg-included transition-all duration-500 ease-out"
+                style={{ width: `${inclusionPercentage}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-card rounded-lg border border-border shadow-sm p-4">
